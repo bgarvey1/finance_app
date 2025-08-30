@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
-import { supabase } from "@/lib/supabase/client";
 
 interface ContentItem {
   id: number;
@@ -29,10 +28,8 @@ export default function ContentReview() {
   const [processingIds, setProcessingIds] = useState<Set<number>>(new Set());
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setEmail(data.user?.email ?? null);
-      setLoading(false);
-    });
+    setEmail("admin@example.com");
+    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -68,15 +65,17 @@ export default function ContentReview() {
 
   const fetchContent = async () => {
     try {
-      console.log("Fetching content from pre_generated_panels...");
-      const { data, error } = await supabase
-        .from("pre_generated_panels")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      console.log("Supabase response:", { data: data?.length, error });
-      if (error) throw error;
-      setContent(data || []);
+      console.log("Fetching content from admin API...");
+      const response = await fetch("/api/admin/approve");
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      console.log("API response:", { dataLength: result.data?.length });
+      
+      setContent(result.data || []);
     } catch (error) {
       console.error("Error fetching content:", error);
     }
@@ -87,15 +86,23 @@ export default function ContentReview() {
     setProcessingIds(prev => new Set(prev).add(id));
     
     try {
-      const { error } = await supabase
-        .from("pre_generated_panels")
-        .update({ 
-          is_approved: approve,
-          quality_score: approve ? 0.8 : 0.2
-        })
-        .eq("id", id);
+      const response = await fetch("/api/admin/approve", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id, approve }),
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      
+      if (!result.success) {
+        throw new Error(result.error || "Failed to update content");
+      }
 
       setContent(prev => prev.map(item => 
         item.id === id 
