@@ -332,6 +332,7 @@ export default function PanelPlayer({ lessonSlug }: { lessonSlug: string }) {
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">{step?.title ?? "Tutor"}</h3>
         <div className="flex items-center gap-3">
+          <div className="text-xs text-blue-600 dark:text-blue-400 font-mono">v2.0 • Bullets + PreGen</div>
           {statusMsg && <div className="text-xs text-green-700 dark:text-green-400">{statusMsg}</div>}
           {loading && <div className="text-xs text-black/60 dark:text-white/60">Thinking…</div>}
         </div>
