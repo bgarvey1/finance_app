@@ -62,9 +62,9 @@ export default function ContentReview() {
         item.topic_id.toLowerCase().includes(term)
       );
     }
-  useEffect(() => {
-    filterContent();
-  }, [content, selectedLesson, selectedStatus, searchTerm, filterContent]);
+
+    setFilteredContent(filtered);
+  }, [content, selectedLesson, selectedStatus, searchTerm]);
 
   const fetchContent = async () => {
     try {
