@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "generate-content": "tsx scripts/generate-content.ts",
-    "apply-schema": "tsx scripts/apply-schema.ts"
+    "apply-schema": "tsx scripts/apply-schema.ts",
+    "approve-content": "tsx scripts/approve-content.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.55.0",
