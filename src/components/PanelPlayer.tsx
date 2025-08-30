@@ -280,24 +280,51 @@ export default function PanelPlayer({ lessonSlug }: { lessonSlug: string }) {
     return String(Math.round(n));
   }
 
-  // Simple Markdown renderer (we can swap to react-markdown if needed, but keeping copy concise)
   const renderMd = (md: string) => {
-    // Very light formatting: split paragraphs and bold markers **text**
     const parts = (md || "").split(/\n\s*\n/g).filter(Boolean);
-    return parts.map((p, i) => (
-      <p key={i} className="whitespace-pre-wrap">
-        {p
-          .split(/(\*\*[^*]+\*\*)/g)
-          .filter(Boolean)
-          .map((seg, j) =>
-            seg.startsWith("**") && seg.endsWith("**") ? (
-              <strong key={j}>{seg.slice(2, -2)}</strong>
-            ) : (
-              <span key={j}>{seg}</span>
-            )
-          )}
-      </p>
-    ));
+    
+    return parts.map((paragraph, i) => {
+      const sentences = paragraph
+        .split(/(?<=[.!?;])\s+|(?:,\s+(?:and|but|or|so|yet)\s+)/g)
+        .map(s => s.trim())
+        .filter(Boolean);
+      
+      if (sentences.length <= 1) {
+        return (
+          <p key={i} className="whitespace-pre-wrap">
+            {paragraph
+              .split(/(\*\*[^*]+\*\*)/g)
+              .filter(Boolean)
+              .map((seg, j) =>
+                seg.startsWith("**") && seg.endsWith("**") ? (
+                  <strong key={j}>{seg.slice(2, -2)}</strong>
+                ) : (
+                  <span key={j}>{seg}</span>
+                )
+              )}
+          </p>
+        );
+      }
+      
+      return (
+        <ul key={i} className="list-disc list-inside space-y-1 text-sm leading-relaxed">
+          {sentences.map((sentence, j) => (
+            <li key={j} className="whitespace-pre-wrap">
+              {sentence
+                .split(/(\*\*[^*]+\*\*)/g)
+                .filter(Boolean)
+                .map((seg, k) =>
+                  seg.startsWith("**") && seg.endsWith("**") ? (
+                    <strong key={k}>{seg.slice(2, -2)}</strong>
+                  ) : (
+                    <span key={k}>{seg}</span>
+                  )
+                )}
+            </li>
+          ))}
+        </ul>
+      );
+    });
   };
 
   return (
