@@ -2,6 +2,8 @@
 
 This app is a Next.js 15 + Supabase project with an adaptive, topic-based tutor. It uses a single, unified architecture: topic progressions defined in TypeScript files. The legacy markdown fallback has been removed.
 
+<!-- Verification comment: Repository access and workflow confirmed -->
+
 ## Quick Start
 
 1) Install and run the dev server:
