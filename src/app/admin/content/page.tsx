@@ -68,11 +68,13 @@ export default function ContentReview() {
 
   const fetchContent = async () => {
     try {
+      console.log("Fetching content from pre_generated_panels...");
       const { data, error } = await supabase
         .from("pre_generated_panels")
         .select("*")
         .order("created_at", { ascending: false });
 
+      console.log("Supabase response:", { data: data?.length, error });
       if (error) throw error;
       setContent(data || []);
     } catch (error) {
