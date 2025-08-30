@@ -41,7 +41,7 @@ export default function ContentReview() {
     }
   }, [email]);
 
-  const filterContent = () => {
+  useEffect(() => {
     let filtered = content;
 
     if (selectedLesson !== "all") {
@@ -62,13 +62,9 @@ export default function ContentReview() {
         item.topic_id.toLowerCase().includes(term)
       );
     }
-
-    setFilteredContent(filtered);
-  };
-
   useEffect(() => {
     filterContent();
-  }, [content, selectedLesson, selectedStatus, searchTerm]);
+  }, [content, selectedLesson, selectedStatus, searchTerm, filterContent]);
 
   const fetchContent = async () => {
     try {
