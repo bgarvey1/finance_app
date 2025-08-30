@@ -1,112 +1,83 @@
-import Image from "next/image";
-import Link from "next/link";
 import AuthStatus from "@/components/AuthStatus";
+import Link from "next/link";
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
+    <div className="min-h-screen p-6">
+      <div className="w-full max-w-3xl mx-auto space-y-6">
         <AuthStatus />
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <Link
-            href="/learn"
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto"
-          >
-            Start learning
-          </Link>
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+        <div className="rounded-xl border border-black/10 dark:border-white/10 p-6 bg-white/60 dark:bg-black/30 backdrop-blur">
+          <h1 className="text-2xl font-semibold mb-2">Finance Tutor</h1>
+          <p className="text-black/70 dark:text-white/70">
+            Learn finance concepts through interactive lessons and adaptive tutoring.
+          </p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        <div className="rounded-xl border border-black/10 dark:border-white/10 p-6 bg-white/60 dark:bg-black/30 backdrop-blur">
+          <h2 className="text-lg font-semibold mb-4">Available Lessons</h2>
+          <div className="space-y-3">
+            <Link
+              href="/learn/tvm/history-of-money"
+              className="block p-4 rounded-lg border border-black/10 dark:border-white/15 hover:bg-black/5 dark:hover:bg-white/10 transition"
+            >
+              <div className="font-medium">History of Money</div>
+              <div className="text-sm text-black/70 dark:text-white/70">
+                Explore the evolution of money from barter systems to modern currency
+              </div>
+            </Link>
+            <Link
+              href="/learn/tvm/ledger-origins"
+              className="block p-4 rounded-lg border border-black/10 dark:border-white/15 hover:bg-black/5 dark:hover:bg-white/10 transition"
+            >
+              <div className="font-medium">Ledger Origins</div>
+              <div className="text-sm text-black/70 dark:text-white/70">
+                Learn about early record-keeping systems and their importance
+              </div>
+            </Link>
+            <Link
+              href="/learn/tvm/early-banking"
+              className="block p-4 rounded-lg border border-black/10 dark:border-white/15 hover:bg-black/5 dark:hover:bg-white/10 transition"
+            >
+              <div className="font-medium">Early Banking</div>
+              <div className="text-sm text-black/70 dark:text-white/70">
+                Discover the origins of banking and financial institutions
+              </div>
+            </Link>
+            <Link
+              href="/learn/tvm/time-value-money"
+              className="block p-4 rounded-lg border border-black/10 dark:border-white/15 hover:bg-black/5 dark:hover:bg-white/10 transition"
+            >
+              <div className="font-medium">Time Value of Money</div>
+              <div className="text-sm text-black/70 dark:text-white/70">
+                Understand present value, future value, and the time value of money
+              </div>
+            </Link>
+            <Link
+              href="/learn/tvm/compounding-interest"
+              className="block p-4 rounded-lg border border-black/10 dark:border-white/15 hover:bg-black/5 dark:hover:bg-white/10 transition"
+            >
+              <div className="font-medium">Compounding Interest</div>
+              <div className="text-sm text-black/70 dark:text-white/70">
+                Learn about the power of compound interest and its applications
+              </div>
+            </Link>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-black/10 dark:border-white/10 p-6 bg-white/60 dark:bg-black/30 backdrop-blur">
+          <h2 className="text-lg font-semibold mb-4">Admin</h2>
+          <Link
+            href="/admin"
+            className="block p-4 rounded-lg border border-black/10 dark:border-white/15 hover:bg-black/5 dark:hover:bg-white/10 transition"
+          >
+            <div className="font-medium">Content Admin</div>
+            <div className="text-sm text-black/70 dark:text-white/70">
+              Review and manage pre-generated content for the tutor
+            </div>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
