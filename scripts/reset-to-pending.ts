@@ -11,6 +11,7 @@ import { createClient } from "@supabase/supabase-js";
 import { config } from "dotenv";
 import { join } from "path";
 
+config({ path: join(__dirname, "../.env") });
 config({ path: join(__dirname, "../.env.local") });
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "";
