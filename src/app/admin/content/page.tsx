@@ -247,7 +247,7 @@ export default function ContentReview() {
                   </button>
                   <button
                     onClick={() => handleApproval(item.id, false)}
-                    disabled={processingIds.has(item.id) || !item.is_approved}
+                    disabled={processingIds.has(item.id)}
                     className="text-sm px-3 py-2 rounded-md bg-red-600 hover:bg-red-700 text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {processingIds.has(item.id) ? "..." : "Discard"}
