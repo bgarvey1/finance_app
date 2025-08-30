@@ -16,7 +16,7 @@ export default function TvmCalculator() {
   const [years, setYears] = useState<number>(5);
 
   const fv = useMemo(() => pv * Math.pow(1 + rate / 100, years), [pv, rate, years]);
-  const pvOfFv = useMemo(() => fv / Math.pow(1 + rate / 100, years), [fv, rate, years]);
+  const pvOfFv = pv;
 
   return (
     <div className="w-full max-w-xl rounded-xl border border-black/10 dark:border-white/10 p-5 bg-white/60 dark:bg-black/30 backdrop-blur space-y-4">
