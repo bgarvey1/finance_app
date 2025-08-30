@@ -10,17 +10,8 @@ config({ path: join(process.cwd(), ".env.local") });
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 
-console.log("🔍 API Route Environment Check:", {
-  hasSupabaseUrl: !!SUPABASE_URL,
-  hasServiceKey: !!SUPABASE_SERVICE_ROLE_KEY,
-  urlPrefix: SUPABASE_URL ? SUPABASE_URL.substring(0, 20) + "..." : "missing",
-  keyPrefix: SUPABASE_SERVICE_ROLE_KEY ? SUPABASE_SERVICE_ROLE_KEY.substring(0, 10) + "..." : "missing",
-  isDummy: SUPABASE_URL.includes("dummy") || SUPABASE_SERVICE_ROLE_KEY.includes("dummy")
-});
-
-if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY || SUPABASE_URL.includes("dummy") || SUPABASE_SERVICE_ROLE_KEY.includes("dummy")) {
-  console.error("❌ Real Supabase credentials are required for admin API");
-  console.error("Please ensure .env file contains valid SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY");
+if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+  console.error("❌ Supabase credentials are required for admin API");
 }
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
