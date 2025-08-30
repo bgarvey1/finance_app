@@ -312,6 +312,70 @@ async function updateConceptStats(
   }
 }
 
+async function selectPreGeneratedContent(
+  admin: any,
+  lessonSlug: string,
+  topicId: string,
+  stepType: string,
+  userId: string
+): Promise<Step | null> {
+  try {
+    const { data: candidates, error } = await admin
+      .from("pre_generated_panels")
+      .select("*")
+      .eq("lesson_slug", lessonSlug)
+      .eq("topic_id", topicId)
+      .eq("step_type", stepType)
+      .eq("is_approved", true)
+      .order("quality_score", { ascending: false })
+      .limit(5);
+
+    if (error || !candidates || candidates.length === 0) {
+      console.log(`[pre-gen] No approved content found for ${lessonSlug}/${topicId}/${stepType}`);
+      return null;
+    }
+
+    const selectedContent = candidates[Math.floor(Math.random() * candidates.length)];
+    
+    try {
+      await admin.from("content_selection_stats").insert({
+        user_id: userId,
+        lesson_slug: lessonSlug,
+        topic_id: topicId,
+        step_type: stepType,
+        content_id: selectedContent.id,
+        selected_at: new Date().toISOString()
+      });
+    } catch (error) {
+      // Don't fail if logging fails
+      console.log("[pre-gen] Failed to log content selection:", error);
+    }
+
+    const step: Step = {
+      type: stepType as any,
+      title: selectedContent.title,
+      body_md: selectedContent.body_md,
+      concept_tags: selectedContent.concept_tags
+    };
+
+    if ((stepType === "panel" || stepType === "reteach") && selectedContent.example_md) {
+      (step as any).example_md = selectedContent.example_md;
+    }
+
+    if (stepType === "question" && selectedContent.choices) {
+      (step as any).choices = selectedContent.choices;
+      (step as any).correct_choice_id = selectedContent.correct_choice_id;
+    }
+
+    console.log(`[pre-gen] Selected content ${selectedContent.id} for ${lessonSlug}/${topicId}/${stepType}`);
+    return step;
+
+  } catch (error) {
+    console.error("[pre-gen] Error selecting pre-generated content:", error);
+    return null;
+  }
+}
+
 export async function POST(req: Request) {
   let parsedBody: TutorRequest | undefined;
   let userId: string | undefined;
@@ -446,53 +510,84 @@ if (recentHasFinalQuiz || shouldEnterFinalQuiz) {
       }
     } catch {}
 
-    // Single-model attempt with MODEL_TUTOR; wait up to TUTOR_TIMEOUT_MS
-    let completion: any = null;
-    let lastErr: any = null;
-    try {
-      // eslint-disable-next-line no-console
-      console.log("[tutor] using single model:", MODEL_TUTOR, "(timeout:", TUTOR_TIMEOUT_MS, "ms)");
-      const input = `${sys}\n\n${user}`;
-      completion = (await Promise.race([
-        client.responses.create({
-          model: MODEL_TUTOR as any,
-          input
-        }),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("tutor_timeout")), TUTOR_TIMEOUT_MS)
-        ),
-      ])) as any;
-    } catch (e: any) {
-      lastErr = e;
+    // Try to use pre-generated content first
+    let step: Step | null = null;
+    
+    if (currentTopic) {
+      // Determine the step type needed based on context
+      let stepType = "panel"; // default
+      
+      const isQA = (lastEvent as any)?.type === "question_answered";
+      const wasCorrect = (lastEvent as any)?.payload?.correct === true;
+      const isFeedback = (lastEvent as any)?.type === "feedback" && (lastEvent as any)?.payload?.didnt_get_it === true;
+      
+      if (isFeedback) {
+        stepType = "reteach";
+      } else if (isQA) {
+        stepType = wasCorrect ? "summary" : "reteach";
+      } else if (forcedTypeUsed) {
+        stepType = forcedTypeUsed;
+      }
+      
+      // Try to get pre-generated content
+      step = await selectPreGeneratedContent(admin, lessonSlug, currentTopic.id, stepType, userId || "");
+      
+      if (step) {
+        console.log(`[pre-gen] Using pre-generated ${stepType} for ${currentTopic.id}`);
+      } else {
+        console.log(`[pre-gen] Falling back to OpenAI for ${currentTopic.id}/${stepType}`);
+      }
     }
-
-    if (!completion) {
-      throw lastErr || new Error("tutor_no_model_succeeded");
-    }
-
-    let content = (completion as any)?.output_text || "";
-    if (!content) {
+    
+    // Fallback to OpenAI if no pre-generated content available
+    if (!step) {
+      let completion: any = null;
+      let lastErr: any = null;
       try {
-        const maybe = (completion as any)?.output?.[0]?.content?.[0]?.text;
-        if (typeof maybe === "string") content = maybe;
-      } catch {}
-    }
-    // Try to extract JSON block if the model wrapped it in code fences
-    const jsonMatch = content.match(/```json\s*([\s\S]*?)```/i);
-    if (jsonMatch) content = jsonMatch[1];
-    const parsed = JSON.parse(content);
+        // eslint-disable-next-line no-console
+        console.log("[tutor] using single model:", MODEL_TUTOR, "(timeout:", TUTOR_TIMEOUT_MS, "ms)");
+        const input = `${sys}\n\n${user}`;
+        completion = (await Promise.race([
+          client.responses.create({
+            model: MODEL_TUTOR as any,
+            input
+          }),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("tutor_timeout")), TUTOR_TIMEOUT_MS)
+          ),
+        ])) as any;
+      } catch (e: any) {
+        lastErr = e;
+      }
 
-    // Minimal shape validation
-    if (!parsed || typeof parsed !== "object" || !parsed.step) {
-      throw new Error("Invalid step payload from model.");
-    }
+      if (!completion) {
+        throw lastErr || new Error("tutor_no_model_succeeded");
+      }
 
-    let step: Step = parsed.step as Step;
+      let content = (completion as any)?.output_text || "";
+      if (!content) {
+        try {
+          const maybe = (completion as any)?.output?.[0]?.content?.[0]?.text;
+          if (typeof maybe === "string") content = maybe;
+        } catch {}
+      }
+      // Try to extract JSON block if the model wrapped it in code fences
+      const jsonMatch = content.match(/```json\s*([\s\S]*?)```/i);
+      if (jsonMatch) content = jsonMatch[1];
+      const parsed = JSON.parse(content);
+
+      // Minimal shape validation
+      if (!parsed || typeof parsed !== "object" || !parsed.step) {
+        throw new Error("Invalid step payload from model.");
+      }
+
+      step = parsed.step as Step;
+    }
     // If using a progression, lock concept tags to the topic to keep state aligned
     // but do NOT override for final quiz steps.
     const isFinalQuizStep =
-      Array.isArray((parsed.step as any)?.concept_tags) &&
-      (parsed.step as any).concept_tags.includes("final_quiz");
+      Array.isArray((step as any)?.concept_tags) &&
+      (step as any).concept_tags.includes("final_quiz");
     if (currentTopic && !isFinalQuizStep) {
       step.concept_tags = currentTopic.concept_tags;
     }
