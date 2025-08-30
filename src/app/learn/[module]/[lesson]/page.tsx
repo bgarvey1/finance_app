@@ -90,6 +90,8 @@ export default function LessonPage() {
     "history-of-money": "History of Money",
     "ledger-origins": "Ledgers & Record‑Keeping",
     "early-banking": "Early Banking",
+    "time-value-money": "Time Value of Money",
+    "compounding-interest": "Power of Compounding Interest",
   };
   const title = isProgressionLesson ? (progressionTitleMap[lessonSlug] ?? "Lesson") : (lessonData?.title ?? "Lesson");
   const showCalculator = useMemo(() => lessonData?.slug === "pv-fv-basics", [lessonData?.slug]);

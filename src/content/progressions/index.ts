@@ -3,11 +3,15 @@ export type { Topic } from "./history-of-money";
 import { historyOfMoneyProgression } from "./history-of-money";
 import { ledgerOriginsProgression } from "./ledger-origins";
 import { earlyBankingProgression } from "./early-banking";
+import { timeValueMoneyProgression } from "./time-value-money";
+import { compoundingInterestProgression } from "./compounding-interest";
 
 export const progressionLessonSlugs: string[] = [
   "history-of-money",
   "ledger-origins",
   "early-banking",
+  "time-value-money",
+  "compounding-interest",
 ];
 
 export function getSupportedLessonSlugs(): string[] {
@@ -26,6 +30,10 @@ export function getProgressionForLesson(lessonSlug: string): Topic[] {
       return ledgerOriginsProgression;
     case "early-banking":
       return earlyBankingProgression;
+    case "time-value-money":
+      return timeValueMoneyProgression;
+    case "compounding-interest":
+      return compoundingInterestProgression;
     default:
       return [];
   }

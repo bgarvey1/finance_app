@@ -43,6 +43,24 @@ const SECTIONS: Section[] = [
       { title: "Early Banking", slug: "early-banking" },
     ],
   },
+  {
+    moduleTitle: "Time Value of Money",
+    moduleSlug: "time-value",
+    description:
+      "Understanding how money's value changes over time through present value, future value, discount rates, and practical applications for investment decisions.",
+    lessons: [
+      { title: "Time Value of Money", slug: "time-value-money" },
+    ],
+  },
+  {
+    moduleTitle: "Power of Compounding Interest",
+    moduleSlug: "compounding",
+    description:
+      "Exploring how compound interest accelerates wealth building, the impact of time horizons, regular contributions, and strategies to maximize compounding effects.",
+    lessons: [
+      { title: "Power of Compounding Interest", slug: "compounding-interest" },
+    ],
+  },
 ];
 
 export default function LearnIndexPage() {
