@@ -8,10 +8,10 @@ import { compoundingInterestProgression } from "./compounding-interest";
 
 export const progressionLessonSlugs: string[] = [
   "history-of-money",
-  "ledger-origins",
-  "early-banking",
   "time-value-money",
   "compounding-interest",
+  "ledger-origins",
+  "early-banking",
 ];
 
 export function getSupportedLessonSlugs(): string[] {
