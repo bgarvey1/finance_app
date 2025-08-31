@@ -9,7 +9,8 @@
     "lint": "next lint",
     "generate-content": "tsx scripts/generate-content.ts",
     "apply-schema": "tsx scripts/apply-schema.ts",
-    "approve-content": "tsx scripts/approve-content.ts"
+    "approve-content": "tsx scripts/approve-content.ts",
+    "reset-to-pending": "tsx scripts/reset-to-pending.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.55.0",
