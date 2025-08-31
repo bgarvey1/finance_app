@@ -27,24 +27,6 @@ export default function HomePage() {
               </div>
             </Link>
             <Link
-              href="/learn/tvm/ledger-origins"
-              className="block p-4 rounded-lg border border-black/10 dark:border-white/15 hover:bg-black/5 dark:hover:bg-white/10 transition"
-            >
-              <div className="font-medium">Ledger Origins</div>
-              <div className="text-sm text-black/70 dark:text-white/70">
-                Learn about early record-keeping systems and their importance
-              </div>
-            </Link>
-            <Link
-              href="/learn/tvm/early-banking"
-              className="block p-4 rounded-lg border border-black/10 dark:border-white/15 hover:bg-black/5 dark:hover:bg-white/10 transition"
-            >
-              <div className="font-medium">Early Banking</div>
-              <div className="text-sm text-black/70 dark:text-white/70">
-                Discover the origins of banking and financial institutions
-              </div>
-            </Link>
-            <Link
               href="/learn/tvm/time-value-money"
               className="block p-4 rounded-lg border border-black/10 dark:border-white/15 hover:bg-black/5 dark:hover:bg-white/10 transition"
             >
@@ -60,6 +42,24 @@ export default function HomePage() {
               <div className="font-medium">Compounding Interest</div>
               <div className="text-sm text-black/70 dark:text-white/70">
                 Learn about the power of compound interest and its applications
+              </div>
+            </Link>
+            <Link
+              href="/learn/tvm/ledger-origins"
+              className="block p-4 rounded-lg border border-black/10 dark:border-white/15 hover:bg-black/5 dark:hover:bg-white/10 transition"
+            >
+              <div className="font-medium">Ledger Origins</div>
+              <div className="text-sm text-black/70 dark:text-white/70">
+                Learn about early record-keeping systems and their importance
+              </div>
+            </Link>
+            <Link
+              href="/learn/tvm/early-banking"
+              className="block p-4 rounded-lg border border-black/10 dark:border-white/15 hover:bg-black/5 dark:hover:bg-white/10 transition"
+            >
+              <div className="font-medium">Early Banking</div>
+              <div className="text-sm text-black/70 dark:text-white/70">
+                Discover the origins of banking and financial institutions
               </div>
             </Link>
           </div>
