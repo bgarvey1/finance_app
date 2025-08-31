@@ -10,7 +10,8 @@
     "generate-content": "tsx scripts/generate-content.ts",
     "apply-schema": "tsx scripts/apply-schema.ts",
     "approve-content": "tsx scripts/approve-content.ts",
-    "reset-to-pending": "tsx scripts/reset-to-pending.ts"
+    "reset-to-pending": "tsx scripts/reset-to-pending.ts",
+    "reduce-content": "tsx scripts/reduce-content.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.55.0",
