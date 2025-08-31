@@ -39,16 +39,31 @@ export default function ContentReview() {
   }, [email]);
 
   useEffect(() => {
+    console.log(`🔄 Filtering content: ${content.length} total items`);
     let filtered = content;
 
     if (selectedLesson !== "all") {
       filtered = filtered.filter(item => item.lesson_slug === selectedLesson);
+      console.log(`📝 After lesson filter: ${filtered.length} items`);
     }
 
     if (selectedStatus !== "all") {
-      filtered = filtered.filter(item => 
-        selectedStatus === "approved" ? item.is_approved : !item.is_approved
-      );
+      filtered = filtered.filter(item => {
+        if (selectedStatus === "approved") {
+          return item.is_approved;
+        } else if (selectedStatus === "pending") {
+          return !item.is_approved && item.quality_score === null;
+        } else if (selectedStatus === "discarded") {
+          return !item.is_approved && item.quality_score !== null;
+        }
+        return true;
+      });
+      console.log(`📝 After status filter (${selectedStatus}): ${filtered.length} items`);
+    } else {
+      filtered = filtered.filter(item => {
+        return item.is_approved || (!item.is_approved && item.quality_score === null);
+      });
+      console.log(`📝 After excluding discarded items: ${filtered.length} items`);
     }
 
     if (searchTerm) {
@@ -58,8 +73,10 @@ export default function ContentReview() {
         item.body_md.toLowerCase().includes(term) ||
         item.topic_id.toLowerCase().includes(term)
       );
+      console.log(`📝 After search filter: ${filtered.length} items`);
     }
 
+    console.log(`✅ Final filtered content: ${filtered.length} items`);
     setFilteredContent(filtered);
   }, [content, selectedLesson, selectedStatus, searchTerm]);
 
@@ -75,6 +92,28 @@ export default function ContentReview() {
       const result = await response.json();
       console.log("API response:", { dataLength: result.data?.length });
       
+      if (result.data && result.data.length > 0) {
+        const approvedItems = result.data.filter((item: ContentItem) => item.is_approved);
+        const pendingItems = result.data.filter((item: ContentItem) => !item.is_approved && item.quality_score === null);
+        const discardedItems = result.data.filter((item: ContentItem) => !item.is_approved && item.quality_score !== null);
+        
+        console.log("Data breakdown:", {
+          total: result.data.length,
+          approved: approvedItems.length,
+          pending: pendingItems.length,
+          discarded: discardedItems.length
+        });
+        
+        if (discardedItems.length > 0) {
+          console.log("Sample discarded item:", {
+            id: discardedItems[0].id,
+            is_approved: discardedItems[0].is_approved,
+            quality_score: discardedItems[0].quality_score,
+            title: discardedItems[0].title?.substring(0, 30)
+          });
+        }
+      }
+      
       setContent(result.data || []);
     } catch (error) {
       console.error("Error fetching content:", error);
@@ -83,15 +122,19 @@ export default function ContentReview() {
 
 
   const handleApproval = async (id: number, approve: boolean) => {
+    console.log(`🔍 handleApproval called with id=${id}, approve=${approve}`);
     setProcessingIds(prev => new Set(prev).add(id));
     
     try {
+      const requestBody = { id, approve };
+      console.log(`📤 Sending API request:`, requestBody);
+      
       const response = await fetch("/api/admin/approve", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ id, approve }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
@@ -99,18 +142,16 @@ export default function ContentReview() {
       }
 
       const result = await response.json();
+      console.log(`📥 API response:`, result);
       
       if (!result.success) {
         throw new Error(result.error || "Failed to update content");
       }
 
-      setContent(prev => prev.map(item => 
-        item.id === id 
-          ? { ...item, is_approved: approve, quality_score: approve ? 0.8 : 0.2 }
-          : item
-      ));
+      console.log(`🔄 Refetching content after successful update for id=${id}`);
+      await fetchContent();
     } catch (error) {
-      console.error("Error updating content:", error);
+      console.error("❌ Error updating content:", error);
     } finally {
       setProcessingIds(prev => {
         const newSet = new Set(prev);
@@ -188,6 +229,7 @@ export default function ContentReview() {
                 <option value="all">All Status</option>
                 <option value="approved">Approved</option>
                 <option value="pending">Pending Review</option>
+                <option value="discarded">Discarded</option>
               </select>
             </div>
             
@@ -225,9 +267,11 @@ export default function ContentReview() {
                     <span className={`text-xs px-2 py-1 rounded-full ${
                       item.is_approved
                         ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                        : "bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200"
+                        : item.quality_score === null
+                        ? "bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200"
+                        : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
                     }`}>
-                      {item.is_approved ? "Approved" : "Pending"}
+                      {item.is_approved ? "Approved" : item.quality_score === null ? "Pending" : "Discarded"}
                     </span>
                   </div>
                   <div className="text-sm text-black/70 dark:text-white/70 space-x-4">

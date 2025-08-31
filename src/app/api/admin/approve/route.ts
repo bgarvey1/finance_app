@@ -21,6 +21,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.log(`🔄 API: Updating content id=${id} with approve=${approve}`);
+    
     const { data, error } = await supabase
       .from("pre_generated_panels")
       .update({
@@ -32,12 +34,18 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error("Error updating content approval:", error);
+      console.error("❌ API: Error updating content approval:", error);
       return NextResponse.json(
         { error: "Failed to update content" },
         { status: 500 }
       );
     }
+
+    console.log(`✅ API: Successfully updated content:`, { 
+      id: data.id, 
+      is_approved: data.is_approved, 
+      quality_score: data.quality_score 
+    });
 
     return NextResponse.json({ success: true, data });
   } catch (error) {
@@ -51,22 +59,29 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
+    console.log(`📥 API: Fetching all content from database`);
+    
     const { data, error } = await supabase
       .from("pre_generated_panels")
       .select("*")
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error("Error fetching content:", error);
+      console.error("❌ API: Error fetching content:", error);
       return NextResponse.json(
         { error: "Failed to fetch content" },
         { status: 500 }
       );
     }
 
+    const approvedCount = data?.filter(item => item.is_approved).length || 0;
+    const pendingCount = data?.filter(item => !item.is_approved).length || 0;
+    
+    console.log(`✅ API: Fetched ${data?.length || 0} items (${approvedCount} approved, ${pendingCount} pending)`);
+
     return NextResponse.json({ data });
   } catch (error) {
-    console.error("Error in approve API GET:", error);
+    console.error("❌ API: Error in approve API GET:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
